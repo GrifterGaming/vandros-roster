@@ -148,7 +148,7 @@
   .member-block:last-child{border-bottom:none;}
   .row{
     display:flex; align-items:center; gap:14px; padding:12px 16px;
-    transition:background .1s ease;
+    transition:background .1s ease; cursor:pointer;
   }
   .row:hover{background:var(--surface-2);}
   .row.expanded{background:var(--surface-2);}
@@ -759,7 +759,7 @@
       var id = row.getAttribute("data-id");
       var mem = findMember(id);
       if (!mem) return;
-      row.querySelector("[data-act=view]").addEventListener("click", function(){ toggleDetail(mem.ID); });
+      row.addEventListener("click", function(){ toggleDetail(mem.ID); });
       var editBtn = row.querySelector("[data-act=edit]");
       if (editBtn) editBtn.addEventListener("click", function(e){ e.stopPropagation(); openMemberModal(mem); });
       var delBtn = row.querySelector("[data-act=delete]");
