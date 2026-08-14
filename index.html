@@ -128,7 +128,22 @@
   .banner code{background:rgba(255,255,255,0.08); padding:2px 6px; border-radius:4px; font-size:12px;}
   .banner[hidden]{display:none;}
 
-  .roster{background:var(--surface-1); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;}
+  .section{margin-bottom:22px;}
+  .section:last-child{margin-bottom:0;}
+  .section-head{
+    display:flex; align-items:baseline; gap:10px; margin-bottom:8px;
+    padding-bottom:6px; border-bottom:1px solid var(--line);
+  }
+  .section-title{
+    font-family:var(--font-display); text-transform:uppercase; letter-spacing:.06em;
+    font-size:14px; font-weight:600; color:var(--text-primary);
+  }
+  .section-count{font-size:12px; color:var(--text-muted);}
+  .section-empty{
+    color:var(--text-muted); font-size:12.5px; padding:14px 16px;
+    background:var(--surface-1); border:1px solid var(--line); border-radius:var(--radius);
+  }
+  .section-list{background:var(--surface-1); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;}
   .row{
     display:flex; align-items:center; gap:14px; padding:12px 16px;
     border-bottom:1px solid var(--line); transition:background .1s ease;
@@ -273,7 +288,7 @@
     </div>
   </div>
 
-  <div class="roster" id="roster"></div>
+  <div id="roster"></div>
 
   <footer>
     Roster data lives in a shared database — every officer's edits show up for everyone,
@@ -357,6 +372,18 @@
 
   var RANKS = ["President","Vice President","Sergeant At Arms","Road Captain","Secretary",
     "Treasurer","Enforcer","Full Patch","Prospect","Hangaround","Nomad"];
+
+  var OFFICER_RANKS = ["President","Vice President","Sergeant At Arms","Road Captain","Secretary","Treasurer","Enforcer"];
+  var SECTION_ORDER = ["Officers","Patch Members","Prospects","Hangaround","Nomad"];
+
+  function sectionForRank(rank){
+    if (OFFICER_RANKS.indexOf(rank) !== -1) return "Officers";
+    if (rank === "Full Patch") return "Patch Members";
+    if (rank === "Prospect") return "Prospects";
+    if (rank === "Hangaround") return "Hangaround";
+    if (rank === "Nomad") return "Nomad";
+    return "Patch Members";
+  }
 
   var STARTER_FLASHES = ["Founder","First 9","Knuckle Duster Pin","Cross Hammer Pin","MF Patch",
     "22 Diamond Patch","1%er Diamond Patch","Cross Axes Patch","VFFV Patch","L.V.D.V. Patch",
@@ -615,33 +642,56 @@
     return hay.indexOf(filterText.toLowerCase()) !== -1;
   }
 
+  function memberRow(mem, editable){
+    return "<div class=\"row\" data-id=\"" + esc(mem.ID) + "\">"
+      + avatarHtml(mem, "sm")
+      + "<button class=\"row-name\" data-act=\"view\">" + esc(mem.Name) + "</button>"
+      + "<div class=\"row-rank\">" + esc(mem.Rank) + "</div>"
+      + "<div class=\"row-flag\">" + esc(mem.Flag) + "</div>"
+      + (editable
+          ? "<div class=\"row-menu\">"
+            + "<button class=\"icon-btn\" data-act=\"edit\" title=\"Edit\">&#9998;</button>"
+            + "<button class=\"icon-btn\" data-act=\"delete\" title=\"Delete\">&#10005;</button>"
+          + "</div>"
+          : "")
+    + "</div>";
+  }
+
   function renderRoster(){
     document.getElementById("memberCount").textContent =
       state.members.length + (state.members.length === 1 ? " member" : " members");
 
-    var list = state.members.filter(matchesFilter);
     var root = document.getElementById("roster");
-    if (!list.length){
-      root.innerHTML = "<div class=\"empty-state\">" +
-        (state.members.length ? "No members match this search." : "No members yet.") +
-        "</div>";
+
+    if (!state.members.length){
+      root.innerHTML = "<div class=\"empty-state\">No members yet.</div>";
       return;
     }
+
+    var filtered = state.members.filter(matchesFilter);
+    if (filterText && !filtered.length){
+      root.innerHTML = "<div class=\"empty-state\">No members match this search.</div>";
+      return;
+    }
+
+    var grouped = {};
+    SECTION_ORDER.forEach(function(s){ grouped[s] = []; });
+    filtered.forEach(function(mem){ grouped[sectionForRank(mem.Rank)].push(mem); });
+
     var editable = canEdit();
-    root.innerHTML = list.map(function(mem){
-      return "<div class=\"row\" data-id=\"" + esc(mem.ID) + "\">"
-        + avatarHtml(mem, "sm")
-        + "<button class=\"row-name\" data-act=\"view\">" + esc(mem.Name) + "</button>"
-        + "<div class=\"row-rank\">" + esc(mem.Rank) + "</div>"
-        + "<div class=\"row-flag\">" + esc(mem.Flag) + "</div>"
-        + (editable
-            ? "<div class=\"row-menu\">"
-              + "<button class=\"icon-btn\" data-act=\"edit\" title=\"Edit\">&#9998;</button>"
-              + "<button class=\"icon-btn\" data-act=\"delete\" title=\"Delete\">&#10005;</button>"
-            + "</div>"
-            : "")
-      + "</div>";
-    }).join("");
+    var html = "";
+    SECTION_ORDER.forEach(function(section){
+      var list = grouped[section];
+      if (!list.length && filterText) return; // hide empty sections while actively searching
+      html += "<div class=\"section\">"
+        + "<div class=\"section-head\"><div class=\"section-title\">" + esc(section) + "</div>"
+        + "<div class=\"section-count\">" + list.length + "</div></div>"
+        + (list.length
+            ? "<div class=\"section-list\">" + list.map(function(mem){ return memberRow(mem, editable); }).join("") + "</div>"
+            : "<div class=\"section-empty\">No members yet.</div>")
+        + "</div>";
+    });
+    root.innerHTML = html;
 
     root.querySelectorAll(".row").forEach(function(row){
       var id = row.getAttribute("data-id");
