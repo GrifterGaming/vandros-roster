@@ -233,6 +233,7 @@
   .flash-add-row input{flex:1;}
   .flash-empty-hint{font-size:11.5px; color:var(--text-muted);}
   .media-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .media-single{max-width:200px;}
   .media-caption{font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px; text-align:center;}
   .media-photo{
     width:100%; aspect-ratio:1/1; border-radius:var(--radius); display:block;
@@ -338,7 +339,6 @@
         </div>
       </div>
       <div class="field full"><label>Photo URL</label><input type="text" id="fPhoto" placeholder="https://…"></div>
-      <div class="field full"><label>Bike Photo URL</label><input type="text" id="fBike" placeholder="https://…"></div>
     </div>
     <div class="field-error" id="memberFormError" style="display:none;"></div>
     <div class="modal-actions">
@@ -673,18 +673,11 @@
       + (flashes.length
           ? "<div class=\"flash-row\">" + flashes.map(function(f){ return "<span class=\"flash-chip\">" + esc(f) + "</span>"; }).join("") + "</div>"
           : "<div class=\"media-empty\">No flashes recorded yet.</div>")
-      + "<div class=\"bio-section-label\">Photos</div>"
-      + "<div class=\"media-grid\">"
-        + "<div><div class=\"media-caption\">Profile</div>"
-          + (mem.PhotoURL
-              ? "<img class=\"media-photo lightbox-trigger\" src=\"" + esc(mem.PhotoURL) + "\" alt=\"" + esc(mem.Name) + "\">"
-              : "<div class=\"media-empty\">No photo yet.</div>")
-        + "</div>"
-        + "<div><div class=\"media-caption\">Bike</div>"
-          + (mem.BikePhotoURL
-              ? "<img class=\"media-photo lightbox-trigger\" src=\"" + esc(mem.BikePhotoURL) + "\" alt=\"" + esc(mem.Name) + "'s bike\">"
-              : "<div class=\"media-empty\">No bike photo yet.</div>")
-        + "</div>"
+      + "<div class=\"bio-section-label\">Photo</div>"
+      + "<div class=\"media-single\">"
+        + (mem.PhotoURL
+            ? "<img class=\"media-photo lightbox-trigger\" src=\"" + esc(mem.PhotoURL) + "\" alt=\"" + esc(mem.Name) + "\">"
+            : "<div class=\"media-empty\">No photo yet.</div>")
       + "</div>"
     + "</div>";
   }
@@ -857,7 +850,6 @@
     document.getElementById("fFlag").value = mem ? mem.Flag : "";
     document.getElementById("fBio").value = mem ? mem.Bio : "";
     document.getElementById("fPhoto").value = mem ? mem.PhotoURL : "";
-    document.getElementById("fBike").value = mem ? mem.BikePhotoURL : "";
     document.getElementById("fNewFlash").value = "";
     selectedFlashes = mem ? flashList(mem) : [];
     renderFlashPicker();
@@ -890,8 +882,7 @@
       Flag: document.getElementById("fFlag").value.trim(),
       Bio: document.getElementById("fBio").value.trim(),
       Flashes: selectedFlashes.slice(),
-      PhotoURL: document.getElementById("fPhoto").value.trim(),
-      BikePhotoURL: document.getElementById("fBike").value.trim()
+      PhotoURL: document.getElementById("fPhoto").value.trim()
     };
 
     var action = editingId ? updateMember(editingId, data) : addMember(data);
