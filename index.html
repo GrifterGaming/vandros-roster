@@ -144,12 +144,21 @@
     background:var(--surface-1); border:1px solid var(--line); border-radius:var(--radius);
   }
   .section-list{background:var(--surface-1); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;}
+  .member-block{border-bottom:1px solid var(--line);}
+  .member-block:last-child{border-bottom:none;}
   .row{
     display:flex; align-items:center; gap:14px; padding:12px 16px;
-    border-bottom:1px solid var(--line); transition:background .1s ease;
+    transition:background .1s ease;
   }
-  .row:last-child{border-bottom:none;}
   .row:hover{background:var(--surface-2);}
+  .row.expanded{background:var(--surface-2);}
+  .row-chevron{
+    font-size:10px; color:var(--text-muted); flex:none; transition:transform .2s ease;
+  }
+  .row.expanded .row-chevron{transform:rotate(180deg);}
+  .row-detail{max-height:0; overflow:hidden; transition:max-height .3s ease;}
+  .row-detail.open{max-height:700px;}
+  .detail-inner{padding:4px 16px 18px;}
   .avatar{
     width:38px; height:38px; border-radius:50%; flex:none; overflow:hidden;
     display:flex; align-items:center; justify-content:center;
@@ -295,10 +304,6 @@
     live. Only Discord accounts on the allow-list can add, edit, or delete members —
     everyone else can view. Use “Export backup” now and then to keep a local copy.
   </footer>
-</div>
-
-<div class="overlay" id="bioOverlay" hidden>
-  <div class="modal" id="bioModal"></div>
 </div>
 
 <div class="overlay" id="lightboxOverlay" hidden>
@@ -644,19 +649,65 @@
     return hay.indexOf(filterText.toLowerCase()) !== -1;
   }
 
-  function memberRow(mem, editable){
-    return "<div class=\"row\" data-id=\"" + esc(mem.ID) + "\">"
-      + avatarHtml(mem, "sm")
-      + "<button class=\"row-name\" data-act=\"view\">" + esc(mem.Name) + "</button>"
-      + "<div class=\"row-rank\">" + esc(mem.Rank) + "</div>"
-      + "<div class=\"row-flag\">" + esc(mem.Flag) + "</div>"
-      + (editable
-          ? "<div class=\"row-menu\">"
-            + "<button class=\"icon-btn\" data-act=\"edit\" title=\"Edit\">&#9998;</button>"
-            + "<button class=\"icon-btn\" data-act=\"delete\" title=\"Delete\">&#10005;</button>"
-          + "</div>"
-          : "")
+  var expandedId = null;
+
+  function rowDetailContent(mem){
+    var flashes = flashList(mem);
+    return "<div class=\"detail-inner\">"
+      + "<div class=\"bio-head\">"
+        + avatarHtml(mem, "lg")
+        + "<div><p class=\"bio-name\">" + esc(mem.Name) + " " + esc(mem.Flag) + "</p>"
+        + "<p class=\"bio-rank\">" + esc(mem.Rank) + "</p></div>"
+      + "</div>"
+      + (mem.Bio ? "<p class=\"bio-bio\">" + esc(mem.Bio) + "</p>" : "<p class=\"bio-bio\" style=\"color:var(--text-muted);\">No bio yet.</p>")
+      + "<div class=\"bio-section-label\">Earned Flashes</div>"
+      + (flashes.length
+          ? "<div class=\"flash-row\">" + flashes.map(function(f){ return "<span class=\"flash-chip\">" + esc(f) + "</span>"; }).join("") + "</div>"
+          : "<div class=\"bike-empty\">No flashes recorded yet.</div>")
+      + "<div class=\"bio-section-label\">Bike</div>"
+      + (mem.BikePhotoURL
+          ? "<img class=\"bike-photo lightbox-trigger\" src=\"" + esc(mem.BikePhotoURL) + "\" alt=\"" + esc(mem.Name) + "'s bike\">"
+          : "<div class=\"bike-empty\">No bike photo yet.</div>")
     + "</div>";
+  }
+
+  function memberRow(mem, editable){
+    var expanded = expandedId === mem.ID;
+    return "<div class=\"member-block\">"
+      + "<div class=\"row" + (expanded ? " expanded" : "") + "\" data-id=\"" + esc(mem.ID) + "\">"
+        + avatarHtml(mem, "sm")
+        + "<button class=\"row-name\" data-act=\"view\">" + esc(mem.Name) + "</button>"
+        + "<div class=\"row-rank\">" + esc(mem.Rank) + "</div>"
+        + "<div class=\"row-flag\">" + esc(mem.Flag) + "</div>"
+        + "<span class=\"row-chevron\">&#9662;</span>"
+        + (editable
+            ? "<div class=\"row-menu\">"
+              + "<button class=\"icon-btn\" data-act=\"edit\" title=\"Edit\">&#9998;</button>"
+              + "<button class=\"icon-btn\" data-act=\"delete\" title=\"Delete\">&#10005;</button>"
+            + "</div>"
+            : "")
+      + "</div>"
+      + "<div class=\"row-detail" + (expanded ? " open" : "") + "\" data-id=\"" + esc(mem.ID) + "\">"
+        + rowDetailContent(mem)
+      + "</div>"
+    + "</div>";
+  }
+
+  function setRowExpanded(id, open){
+    var idStr = String(id);
+    document.querySelectorAll(".row[data-id]").forEach(function(el){
+      if (el.getAttribute("data-id") === idStr) el.classList.toggle("expanded", open);
+    });
+    document.querySelectorAll(".row-detail[data-id]").forEach(function(el){
+      if (el.getAttribute("data-id") === idStr) el.classList.toggle("open", open);
+    });
+  }
+
+  function toggleDetail(id){
+    var prevId = expandedId;
+    expandedId = (expandedId === id) ? null : id;
+    if (prevId && prevId !== id) setRowExpanded(prevId, false);
+    setRowExpanded(id, expandedId === id);
   }
 
   function renderRoster(){
@@ -702,60 +753,26 @@
       var id = row.getAttribute("data-id");
       var mem = findMember(id);
       if (!mem) return;
-      row.querySelector("[data-act=view]").addEventListener("click", function(){ openBio(mem); });
+      row.querySelector("[data-act=view]").addEventListener("click", function(){ toggleDetail(mem.ID); });
       var editBtn = row.querySelector("[data-act=edit]");
-      if (editBtn) editBtn.addEventListener("click", function(){ openMemberModal(mem); });
+      if (editBtn) editBtn.addEventListener("click", function(e){ e.stopPropagation(); openMemberModal(mem); });
       var delBtn = row.querySelector("[data-act=delete]");
-      if (delBtn) delBtn.addEventListener("click", function(){
+      if (delBtn) delBtn.addEventListener("click", function(e){
+        e.stopPropagation();
         if (!canEdit()) return;
         if (confirm("Remove " + mem.Name + " from the roster?")){
           deleteMember(mem.ID);
         }
       });
     });
-  }
 
-  /* ============================= BIO MODAL ============================= */
-
-  function openBio(mem){
-    var flashes = flashList(mem);
-    var html = "<div class=\"bio-head\">"
-        + avatarHtml(mem, "lg")
-        + "<div><p class=\"bio-name\">" + esc(mem.Name) + " " + esc(mem.Flag) + "</p>"
-        + "<p class=\"bio-rank\">" + esc(mem.Rank) + "</p></div>"
-      + "</div>"
-      + (mem.Bio ? "<p class=\"bio-bio\">" + esc(mem.Bio) + "</p>" : "<p class=\"bio-bio\" style=\"color:var(--text-muted);\">No bio yet.</p>")
-      + "<div class=\"bio-section-label\">Earned Flashes</div>"
-      + (flashes.length
-          ? "<div class=\"flash-row\">" + flashes.map(function(f){ return "<span class=\"flash-chip\">" + esc(f) + "</span>"; }).join("") + "</div>"
-          : "<div class=\"bike-empty\">No flashes recorded yet.</div>")
-      + "<div class=\"bio-section-label\">Bike</div>"
-      + (mem.BikePhotoURL
-          ? "<img class=\"bike-photo lightbox-trigger\" src=\"" + esc(mem.BikePhotoURL) + "\" alt=\"" + esc(mem.Name) + "'s bike\">"
-          : "<div class=\"bike-empty\">No bike photo yet.</div>")
-      + "<div class=\"modal-actions\">"
-        + "<button class=\"btn btn-ghost\" id=\"btnCloseBio\">Close</button>"
-        + (canEdit() ? "<button class=\"btn btn-accent\" id=\"btnEditFromBio\">Edit</button>" : "")
-      + "</div>";
-    document.getElementById("bioModal").innerHTML = html;
-    document.getElementById("bioOverlay").hidden = false;
-    document.getElementById("bioModal").querySelectorAll(".lightbox-trigger").forEach(function(img){
+    root.querySelectorAll(".row-detail .lightbox-trigger").forEach(function(img){
       img.addEventListener("click", function(e){
         e.stopPropagation();
         openLightbox(img.src, img.alt);
       });
     });
-    document.getElementById("btnCloseBio").addEventListener("click", closeBio);
-    var editFromBio = document.getElementById("btnEditFromBio");
-    if (editFromBio) editFromBio.addEventListener("click", function(){
-      closeBio();
-      openMemberModal(mem);
-    });
   }
-  function closeBio(){ document.getElementById("bioOverlay").hidden = true; }
-  document.getElementById("bioOverlay").addEventListener("click", function(e){
-    if (e.target.id === "bioOverlay") closeBio();
-  });
 
   /* ============================= LIGHTBOX ============================= */
 
