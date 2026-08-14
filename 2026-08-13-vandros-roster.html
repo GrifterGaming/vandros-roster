@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vandros MC — Roster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: dark;
+    --page:            #0a0b0a;
+    --surface-1:       #14170f;
+    --surface-2:       #1a1e14;
+    --surface-3:       #212617;
+    --line:            rgba(255,255,255,0.09);
+    --line-strong:     rgba(255,255,255,0.16);
+    --text-primary:    #ffffff;
+    --text-secondary:  #c7cfc0;
+    --text-muted:      #8a9280;
+    --accent:          #274E13;
+    --accent-hover:    #366b1b;
+    --accent-soft:     rgba(39,78,19,0.28);
+    --accent-text:     #8fd66a;
+
+    --status-danger:   #b23a3a;
+    --status-danger-bg: rgba(178,58,58,0.16);
+
+    --font-display: 'Oswald', 'Arial Narrow', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(39,78,19,0.16), transparent 60%),
+      radial-gradient(1000px 500px at 100% 0%, rgba(255,255,255,0.03), transparent 55%),
+      var(--page);
+    color:var(--text-primary);
+    font-family:var(--font-body);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--accent-soft);}
+  a{color:var(--accent-text);}
+
+  button{font-family:inherit;}
+  .btn{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--surface-3); color:var(--text-primary);
+    border:1px solid var(--line-strong); border-radius:var(--radius-sm);
+    padding:9px 14px; font-size:13px; font-weight:600; letter-spacing:.02em;
+    cursor:pointer; transition:background .15s ease, border-color .15s ease, transform .05s ease;
+    white-space:nowrap;
+  }
+  .btn:hover{background:#262c1c; border-color:rgba(255,255,255,0.24);}
+  .btn:active{transform:translateY(1px);}
+  .btn-accent{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .btn-accent:hover{background:var(--accent-hover); border-color:var(--accent-hover);}
+  .btn-ghost{background:transparent;}
+  .btn-danger{background:transparent; border-color:rgba(178,58,58,0.5); color:#f0a3a3;}
+  .btn-danger:hover{background:rgba(178,58,58,0.14); border-color:var(--status-danger);}
+  .btn-sm{padding:6px 10px; font-size:12px;}
+  .btn[hidden]{display:none;}
+
+  input[type=text], input[type=search], textarea, select{
+    background:var(--surface-2); color:var(--text-primary);
+    border:1px solid var(--line-strong); border-radius:var(--radius-sm);
+    padding:8px 10px; font-size:13px; font-family:var(--font-body);
+    outline:none;
+  }
+  input[type=text]:focus, input[type=search]:focus, textarea:focus{
+    border-color:var(--accent-text);
+  }
+  textarea{resize:vertical; min-height:70px;}
+  label{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted); font-weight:600;}
+
+  .wrap{max-width:900px; margin:0 auto; padding:28px 24px 80px;}
+
+  .topbar{
+    display:flex; align-items:flex-end; justify-content:space-between; gap:20px;
+    flex-wrap:wrap; margin-bottom:18px; padding-bottom:18px;
+    border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex; align-items:center; gap:14px;}
+  .brand-mark{
+    width:46px; height:46px; border-radius:8px; flex:none;
+    background:linear-gradient(160deg, var(--accent-hover), var(--accent) 70%);
+    border:1px solid var(--line-strong);
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
+    color:#fff; font-family:var(--font-display); font-size:22px; font-weight:700;
+  }
+  .brand-mark img{width:100%; height:100%; object-fit:cover;}
+  h1{
+    font-family:var(--font-display); font-weight:700; text-transform:uppercase;
+    letter-spacing:.03em; font-size:24px; margin:0; line-height:1;
+  }
+  .subtitle{color:var(--text-muted); font-size:12.5px; margin-top:5px; letter-spacing:.02em;}
+  .topbar-actions{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .discord-who{font-size:12px; color:var(--text-secondary); margin-right:2px;}
+  .discord-who b{color:var(--accent-text);}
+
+  .toolbar-row{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    flex-wrap:wrap; margin-bottom:18px;
+  }
+  .sync-status{display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text-muted);}
+  .sync-dot{width:8px; height:8px; border-radius:50%; background:var(--text-muted); flex:none;}
+  .sync-dot.ok{background:var(--accent-text);}
+  .sync-dot.err{background:#f0a3a3;}
+  .member-count{color:var(--text-muted);}
+  .search-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  .search-row input[type=search]{width:220px;}
+
+  .banner{
+    background:var(--status-danger-bg); border:1px solid rgba(178,58,58,0.4);
+    color:#f0a3a3; border-radius:var(--radius); padding:12px 14px;
+    font-size:12.5px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  }
+  .banner.setup{
+    background:var(--surface-1); border-color:var(--line-strong); color:var(--text-secondary);
+  }
+  .banner code{background:rgba(255,255,255,0.08); padding:2px 6px; border-radius:4px; font-size:12px;}
+
+  .roster{background:var(--surface-1); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;}
+  .row{
+    display:flex; align-items:center; gap:14px; padding:12px 16px;
+    border-bottom:1px solid var(--line); transition:background .1s ease;
+  }
+  .row:last-child{border-bottom:none;}
+  .row:hover{background:var(--surface-2);}
+  .avatar{
+    width:38px; height:38px; border-radius:50%; flex:none; overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:700; color:#fff; background:var(--accent);
+  }
+  .avatar img{width:100%; height:100%; object-fit:cover;}
+  .row-name{
+    background:none; border:none; padding:0; cursor:pointer;
+    font-size:14.5px; font-weight:700; color:var(--text-primary);
+    text-decoration:underline; text-decoration-color:var(--accent-text); text-underline-offset:3px;
+    font-family:inherit; flex:1 1 160px; text-align:left; min-width:0;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .row-name:hover{color:var(--accent-text);}
+  .row-rank{
+    font-size:12px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.04em;
+    flex:2 1 200px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .row-flag{font-size:18px; flex:none;}
+  .row-menu{display:flex; gap:4px; flex:none;}
+  .icon-btn{
+    background:transparent; border:1px solid transparent; color:var(--text-muted);
+    border-radius:6px; width:26px; height:26px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:14px;
+  }
+  .icon-btn:hover{background:var(--surface-3); color:var(--text-primary); border-color:var(--line-strong);}
+
+  .empty-state{color:var(--text-muted); font-size:13px; padding:30px; text-align:center;}
+
+  .overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.65); backdrop-filter:blur(2px);
+    display:flex; align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .overlay[hidden]{display:none;}
+  .modal{
+    background:var(--surface-1); border:1px solid var(--line-strong); border-radius:12px;
+    width:100%; max-width:480px; padding:22px; max-height:90vh; overflow:auto;
+  }
+  .modal h2{font-family:var(--font-display); text-transform:uppercase; letter-spacing:.03em; font-size:18px; margin:0 0 16px;}
+  .form-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .form-grid .full{grid-column:1/-1;}
+  .field{display:flex; flex-direction:column; gap:5px;}
+  .field input, .field textarea, .field select{width:100%;}
+  .modal-actions{display:flex; justify-content:flex-end; gap:8px; margin-top:20px;}
+  .field-error{font-size:11.5px; color:#f0a3a3;}
+
+  .bio-head{display:flex; gap:16px; align-items:center; margin-bottom:14px;}
+  .bio-avatar{
+    width:64px; height:64px; border-radius:50%; flex:none; overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px; font-weight:700; color:#fff; background:var(--accent);
+  }
+  .bio-avatar img{width:100%; height:100%; object-fit:cover;}
+  .bio-name{font-family:var(--font-display); font-size:19px; font-weight:600; margin:0;}
+  .bio-rank{font-size:12.5px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.04em; margin:3px 0 0;}
+  .bio-section-label{font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; margin:14px 0 6px;}
+  .bio-bio{font-size:13.5px; color:var(--text-secondary); line-height:1.6; margin:0;}
+  .flash-row{display:flex; flex-wrap:wrap; gap:6px;}
+  .flash-chip{
+    font-size:11.5px; font-weight:700; padding:4px 10px; border-radius:20px;
+    background:var(--accent-soft); color:var(--accent-text); border:1px solid rgba(39,78,19,0.7);
+  }
+  .flash-picker{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;}
+  .flash-pick{
+    font-size:11.5px; font-weight:700; padding:4px 10px; border-radius:20px; cursor:pointer;
+    border:1px solid var(--line-strong); background:var(--surface-2); color:var(--text-secondary);
+    user-select:none; transition:background .1s ease, color .1s ease, border-color .1s ease;
+  }
+  .flash-pick:hover{border-color:var(--line-strong); color:var(--text-primary);}
+  .flash-pick.selected{background:var(--accent-soft); color:var(--accent-text); border-color:rgba(39,78,19,0.7);}
+  .flash-add-row{display:flex; gap:6px;}
+  .flash-add-row input{flex:1;}
+  .flash-empty-hint{font-size:11.5px; color:var(--text-muted);}
+  .bike-photo{width:100%; border-radius:var(--radius); display:block; max-height:220px; object-fit:cover;}
+  .bike-empty{
+    border:1px dashed var(--line-strong); border-radius:var(--radius); padding:22px;
+    text-align:center; font-size:12px; color:var(--text-muted);
+  }
+  .lightbox-trigger{cursor:zoom-in;}
+  .lightbox-box{max-width:92vw; max-height:92vh;}
+  .lightbox-box img{max-width:92vw; max-height:92vh; display:block; border-radius:12px; box-shadow:0 12px 40px rgba(0,0,0,.6); cursor:zoom-out;}
+
+  .toast{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    background:var(--surface-3); border:1px solid var(--line-strong); color:var(--text-primary);
+    padding:10px 18px; border-radius:8px; font-size:13px; z-index:60; box-shadow:0 8px 24px rgba(0,0,0,.4);
+    opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-4px);}
+
+  footer{margin-top:30px; color:var(--text-muted); font-size:11.5px; text-align:center; line-height:1.6;}
+
+  @media (max-width: 640px){
+    .wrap{padding:18px 14px 60px;}
+    .form-grid{grid-template-columns:1fr;}
+    .row-rank{display:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark" id="brandMark">V</div>
+      <div>
+        <h1>Vandros MC</h1>
+        <div class="subtitle">Club Roster</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <span class="discord-who" id="discordWho" hidden></span>
+      <button class="btn" id="btnDiscordLogin">Log in with Discord</button>
+      <button class="btn" id="btnDiscordLogout" hidden>Log out</button>
+      <button class="btn" id="btnExport">Export backup</button>
+      <button class="btn btn-accent" id="btnAddMember" hidden>+ Add Member</button>
+    </div>
+  </div>
+
+  <div id="setupBanner" class="banner setup" hidden>
+    Not connected to Firebase yet. Open this file and set <code>FIREBASE_CONFIG</code>
+    near the top of the <code>&lt;script&gt;</code> to your Firebase project's config.
+  </div>
+  <div id="errorBanner" class="banner" hidden>
+    <span id="errorText">Couldn't reach the database — showing last loaded data.</span>
+  </div>
+
+  <div class="toolbar-row">
+    <div class="sync-status">
+      <span class="sync-dot" id="syncDot"></span>
+      <span id="syncText">Connecting…</span>
+      <span class="member-count" id="memberCount"></span>
+    </div>
+    <div class="search-row">
+      <input type="search" id="searchInput" placeholder="Search name or rank…">
+    </div>
+  </div>
+
+  <div class="roster" id="roster"></div>
+
+  <footer>
+    Roster data lives in a shared database — every officer's edits show up for everyone,
+    live. Only Discord accounts on the allow-list can add, edit, or delete members —
+    everyone else can view. Use “Export backup” now and then to keep a local copy.
+  </footer>
+</div>
+
+<div class="overlay" id="bioOverlay" hidden>
+  <div class="modal" id="bioModal"></div>
+</div>
+
+<div class="overlay" id="lightboxOverlay" hidden>
+  <div class="lightbox-box">
+    <img id="lightboxImg" src="" alt="">
+  </div>
+</div>
+
+<div class="overlay" id="memberOverlay" hidden>
+  <div class="modal">
+    <h2 id="memberModalTitle">Add Member</h2>
+    <div class="form-grid">
+      <div class="field full"><label>Name</label><input type="text" id="fName"></div>
+      <div class="field"><label>Rank</label><select id="fRank"></select></div>
+      <div class="field"><label>Flag</label><input type="text" id="fFlag" placeholder="🇺🇸"></div>
+      <div class="field full"><label>Short Bio</label><textarea id="fBio"></textarea></div>
+      <div class="field full">
+        <label>Earned Flashes</label>
+        <div class="flash-picker" id="flashPicker"></div>
+        <div class="flash-add-row">
+          <input type="text" id="fNewFlash" placeholder="Add a new flash type…">
+          <button type="button" class="btn btn-sm" id="btnAddFlashOption">+ Add</button>
+        </div>
+      </div>
+      <div class="field full"><label>Photo URL</label><input type="text" id="fPhoto" placeholder="https://…"></div>
+      <div class="field full"><label>Bike Photo URL</label><input type="text" id="fBike" placeholder="https://…"></div>
+    </div>
+    <div class="field-error" id="memberFormError" style="display:none;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="btnCancelMember">Cancel</button>
+      <button class="btn btn-accent" id="btnSaveMember">Save Member</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* ============================= CONFIG ============================= */
+
+  // Paste your Firebase project's config here (Firebase Console > Project
+  // Settings > General > Your apps > Web app > SDK setup and configuration).
+  var FIREBASE_CONFIG = {
+    apiKey: "AIzaSyCv9onCyMOZqseS2Gm-sLoKNPU15qhVvZY",
+    authDomain: "vandros-mc-roster.firebaseapp.com",
+    projectId: "vandros-mc-roster",
+    storageBucket: "vandros-mc-roster.firebasestorage.app",
+    messagingSenderId: "657437032687",
+    appId: "1:657437032687:web:51712a6c5232d903425b1a"
+  };
+
+  var DISCORD_SESSION_KEY = "vandrosDiscordSession";
+
+  // From the Discord Developer Portal (discord.com/developers/applications) —
+  // this is your Application's Client ID (public, safe to leave in the file).
+  var DISCORD_CLIENT_ID = "1537823245380616204";
+
+  // Discord User IDs allowed to add, edit, or delete members. Everyone else
+  // can log in and view, but won't see the edit controls.
+  // To get someone's ID: in Discord, Settings > Advanced > turn on Developer
+  // Mode, then right-click their name > Copy User ID.
+  var ALLOWED_DISCORD_IDS = [
+    // "123456789012345678",
+  ];
+
+  var RANKS = ["President","Vice President","Sergeant At Arms","Road Captain","Secretary",
+    "Treasurer","Enforcer","Full Patch","Prospect","Hangaround","Nomad"];
+
+  var STARTER_FLASHES = ["Founder","First 9","Knuckle Duster Pin","Cross Hammer Pin","MF Patch",
+    "22 Diamond Patch","1%er Diamond Patch","Cross Axes Patch","VFFV Patch","L.V.D.V. Patch",
+    "RIP Psycho Rocker","RIP Bandit Rocker","RIP Bellamy Rocker","RIP Sargento Rocker","RIP Trx Rocker"];
+
+  /* ============================= STATE ============================= */
+
+  var state = { members: [], flashOptions: [] };
+  var filterText = "";
+  var editingId = null;
+  var selectedFlashes = [];
+  var discordUser = null; // { id, username, allowed }
+  var db = null;
+
+  /* ============================= FIREBASE ============================= */
+
+  function firebaseConfigured(){
+    return !!FIREBASE_CONFIG.apiKey;
+  }
+
+  function setSyncStatus(ok, label){
+    var dot = document.getElementById("syncDot");
+    dot.className = "sync-dot" + (ok===true ? " ok" : ok===false ? " err" : "");
+    document.getElementById("syncText").textContent = label;
+  }
+
+  function initFirebase(){
+    if (!firebaseConfigured()){
+      document.getElementById("setupBanner").hidden = false;
+      setSyncStatus(null, "Not connected");
+      renderRoster();
+      return;
+    }
+    document.getElementById("setupBanner").hidden = true;
+    setSyncStatus(null, "Connecting…");
+    try{
+      firebase.initializeApp(FIREBASE_CONFIG);
+      db = firebase.firestore();
+    }catch(e){
+      document.getElementById("errorBanner").hidden = false;
+      document.getElementById("errorText").textContent = "Couldn't set up Firebase: " + e.message;
+      setSyncStatus(false, "Connection failed");
+      return;
+    }
+    firebase.auth().signInAnonymously().then(function(){
+      subscribeMembers();
+      subscribeFlashOptions();
+    }).catch(function(err){
+      document.getElementById("errorBanner").hidden = false;
+      document.getElementById("errorText").textContent = "Couldn't connect: " + err.message;
+      setSyncStatus(false, "Connection failed");
+    });
+  }
+
+  function subscribeMembers(){
+    db.collection("members").onSnapshot(function(snapshot){
+      state.members = snapshot.docs.map(function(doc){
+        var data = doc.data();
+        data.ID = doc.id;
+        if (!Array.isArray(data.Flashes)) data.Flashes = [];
+        return data;
+      });
+      document.getElementById("errorBanner").hidden = true;
+      setSyncStatus(true, "Live");
+      renderRoster();
+    }, function(err){
+      document.getElementById("errorBanner").hidden = false;
+      document.getElementById("errorText").textContent = "Couldn't reach the database — showing last loaded data.";
+      setSyncStatus(false, "Connection lost");
+    });
+  }
+
+  function subscribeFlashOptions(){
+    var ref = db.collection("settings").doc("flashOptions");
+    ref.onSnapshot(function(doc){
+      if (!doc.exists){
+        ref.set({ list: STARTER_FLASHES }).catch(function(){});
+        return;
+      }
+      var data = doc.data();
+      state.flashOptions = (data && Array.isArray(data.list)) ? data.list : [];
+      var overlay = document.getElementById("memberOverlay");
+      if (overlay && !overlay.hidden) renderFlashPicker();
+    });
+  }
+
+  function addMember(data){
+    return db.collection("members").add(data).then(function(){
+      showToast("Member added.");
+    }).catch(function(err){ showToast("Something went wrong: " + err.message); throw err; });
+  }
+  function updateMember(id, data){
+    return db.collection("members").doc(id).update(data).then(function(){
+      showToast("Member updated.");
+    }).catch(function(err){ showToast("Something went wrong: " + err.message); throw err; });
+  }
+  function deleteMember(id){
+    return db.collection("members").doc(id).delete().then(function(){
+      showToast("Member removed.");
+    }).catch(function(err){ showToast("Something went wrong: " + err.message); });
+  }
+  function addFlashOption(name){
+    return db.collection("settings").doc("flashOptions").set({
+      list: firebase.firestore.FieldValue.arrayUnion(name)
+    }, { merge: true }).catch(function(err){ showToast("Something went wrong: " + err.message); });
+  }
+
+  /* ============================= HELPERS ============================= */
+
+  function esc(s){
+    return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  function initials(name){
+    var parts = String(name||"").trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return "?";
+    if (parts.length === 1) return parts[0].slice(0,2).toUpperCase();
+    return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+  }
+
+  var GREEN_SHADES = ["#274E13","#33611c","#3f7423","#1d3c0f"];
+  function colorFor(id){
+    var s = String(id||"");
+    var h = 0;
+    for (var i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i)) >>> 0;
+    return GREEN_SHADES[h % GREEN_SHADES.length];
+  }
+
+  function flashList(mem){
+    return Array.isArray(mem.Flashes) ? mem.Flashes : [];
+  }
+
+  function avatarHtml(mem, size){
+    var cls = size === "lg" ? "bio-avatar" : "avatar";
+    if (mem.PhotoURL){
+      var imgClass = size === "lg" ? " class=\"lightbox-trigger\"" : "";
+      return "<div class=\"" + cls + "\"><img" + imgClass + " src=\"" + esc(mem.PhotoURL) + "\" alt=\"\"></div>";
+    }
+    return "<div class=\"" + cls + "\" style=\"background:" + colorFor(mem.ID || mem.Name) + "\">" + esc(initials(mem.Name)) + "</div>";
+  }
+
+  function showToast(msg){
+    var el = document.getElementById("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(el._t);
+    el._t = setTimeout(function(){ el.classList.remove("show"); }, 2600);
+  }
+
+  function findMember(id){
+    for (var i=0;i<state.members.length;i++){ if (String(state.members[i].ID) === String(id)) return state.members[i]; }
+    return null;
+  }
+
+  function canEdit(){
+    return !!(discordUser && discordUser.allowed);
+  }
+
+  /* ============================= DISCORD LOGIN ============================= */
+
+  function updateAuthUI(){
+    var loginBtn = document.getElementById("btnDiscordLogin");
+    var logoutBtn = document.getElementById("btnDiscordLogout");
+    var whoLabel = document.getElementById("discordWho");
+    var addBtn = document.getElementById("btnAddMember");
+
+    if (discordUser){
+      loginBtn.hidden = true;
+      logoutBtn.hidden = false;
+      whoLabel.hidden = false;
+      whoLabel.innerHTML = discordUser.allowed
+        ? ("Logged in as <b>" + esc(discordUser.username) + "</b> (editor)")
+        : ("Logged in as <b>" + esc(discordUser.username) + "</b> (view only)");
+      addBtn.hidden = !discordUser.allowed;
+    } else {
+      loginBtn.hidden = false;
+      logoutBtn.hidden = true;
+      whoLabel.hidden = true;
+      addBtn.hidden = true;
+    }
+    renderRoster();
+  }
+
+  function fetchDiscordUser(token){
+    return fetch("https://discord.com/api/users/@me", {
+      headers: { Authorization: "Bearer " + token }
+    }).then(function(r){
+      if (!r.ok) throw new Error("Discord lookup failed.");
+      return r.json();
+    });
+  }
+
+  function setDiscordSession(token, user){
+    discordUser = {
+      id: String(user.id),
+      username: user.username || user.global_name || "Unknown",
+      allowed: ALLOWED_DISCORD_IDS.indexOf(String(user.id)) !== -1
+    };
+    try{ sessionStorage.setItem(DISCORD_SESSION_KEY, JSON.stringify({ token: token, user: discordUser })); }catch(e){}
+    updateAuthUI();
+  }
+
+  function handleDiscordRedirect(){
+    if (location.hash && location.hash.indexOf("access_token=") !== -1){
+      var params = new URLSearchParams(location.hash.slice(1));
+      var token = params.get("access_token");
+      history.replaceState(null, "", location.pathname + location.search);
+      if (token){
+        fetchDiscordUser(token).then(function(user){
+          setDiscordSession(token, user);
+          showToast(canEdit() ? "Logged in — you can edit the roster." : "Logged in — view only.");
+        }).catch(function(){
+          showToast("Discord login failed.");
+        });
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function restoreDiscordSession(){
+    var raw = null;
+    try{ raw = sessionStorage.getItem(DISCORD_SESSION_KEY); }catch(e){}
+    if (raw){
+      try{
+        var parsed = JSON.parse(raw);
+        if (parsed && parsed.user) discordUser = parsed.user;
+      }catch(e){}
+    }
+  }
+
+  document.getElementById("btnDiscordLogin").addEventListener("click", function(){
+    if (!DISCORD_CLIENT_ID){ showToast("Discord isn't configured yet — set DISCORD_CLIENT_ID in the file."); return; }
+    var redirectUri = location.origin + location.pathname;
+    var authUrl = "https://discord.com/oauth2/authorize"
+      + "?client_id=" + encodeURIComponent(DISCORD_CLIENT_ID)
+      + "&redirect_uri=" + encodeURIComponent(redirectUri)
+      + "&response_type=token&scope=identify";
+    location.href = authUrl;
+  });
+
+  document.getElementById("btnDiscordLogout").addEventListener("click", function(){
+    discordUser = null;
+    try{ sessionStorage.removeItem(DISCORD_SESSION_KEY); }catch(e){}
+    updateAuthUI();
+    showToast("Logged out.");
+  });
+
+  /* ============================= RENDER: ROSTER ============================= */
+
+  function matchesFilter(mem){
+    if (!filterText) return true;
+    var hay = (mem.Name + " " + mem.Rank).toLowerCase();
+    return hay.indexOf(filterText.toLowerCase()) !== -1;
+  }
+
+  function renderRoster(){
+    document.getElementById("memberCount").textContent =
+      state.members.length + (state.members.length === 1 ? " member" : " members");
+
+    var list = state.members.filter(matchesFilter);
+    var root = document.getElementById("roster");
+    if (!list.length){
+      root.innerHTML = "<div class=\"empty-state\">" +
+        (state.members.length ? "No members match this search." : "No members yet.") +
+        "</div>";
+      return;
+    }
+    var editable = canEdit();
+    root.innerHTML = list.map(function(mem){
+      return "<div class=\"row\" data-id=\"" + esc(mem.ID) + "\">"
+        + avatarHtml(mem, "sm")
+        + "<button class=\"row-name\" data-act=\"view\">" + esc(mem.Name) + "</button>"
+        + "<div class=\"row-rank\">" + esc(mem.Rank) + "</div>"
+        + "<div class=\"row-flag\">" + esc(mem.Flag) + "</div>"
+        + (editable
+            ? "<div class=\"row-menu\">"
+              + "<button class=\"icon-btn\" data-act=\"edit\" title=\"Edit\">&#9998;</button>"
+              + "<button class=\"icon-btn\" data-act=\"delete\" title=\"Delete\">&#10005;</button>"
+            + "</div>"
+            : "")
+      + "</div>";
+    }).join("");
+
+    root.querySelectorAll(".row").forEach(function(row){
+      var id = row.getAttribute("data-id");
+      var mem = findMember(id);
+      if (!mem) return;
+      row.querySelector("[data-act=view]").addEventListener("click", function(){ openBio(mem); });
+      var editBtn = row.querySelector("[data-act=edit]");
+      if (editBtn) editBtn.addEventListener("click", function(){ openMemberModal(mem); });
+      var delBtn = row.querySelector("[data-act=delete]");
+      if (delBtn) delBtn.addEventListener("click", function(){
+        if (!canEdit()) return;
+        if (confirm("Remove " + mem.Name + " from the roster?")){
+          deleteMember(mem.ID);
+        }
+      });
+    });
+  }
+
+  /* ============================= BIO MODAL ============================= */
+
+  function openBio(mem){
+    var flashes = flashList(mem);
+    var html = "<div class=\"bio-head\">"
+        + avatarHtml(mem, "lg")
+        + "<div><p class=\"bio-name\">" + esc(mem.Name) + " " + esc(mem.Flag) + "</p>"
+        + "<p class=\"bio-rank\">" + esc(mem.Rank) + "</p></div>"
+      + "</div>"
+      + (mem.Bio ? "<p class=\"bio-bio\">" + esc(mem.Bio) + "</p>" : "<p class=\"bio-bio\" style=\"color:var(--text-muted);\">No bio yet.</p>")
+      + "<div class=\"bio-section-label\">Earned Flashes</div>"
+      + (flashes.length
+          ? "<div class=\"flash-row\">" + flashes.map(function(f){ return "<span class=\"flash-chip\">" + esc(f) + "</span>"; }).join("") + "</div>"
+          : "<div class=\"bike-empty\">No flashes recorded yet.</div>")
+      + "<div class=\"bio-section-label\">Bike</div>"
+      + (mem.BikePhotoURL
+          ? "<img class=\"bike-photo lightbox-trigger\" src=\"" + esc(mem.BikePhotoURL) + "\" alt=\"" + esc(mem.Name) + "'s bike\">"
+          : "<div class=\"bike-empty\">No bike photo yet.</div>")
+      + "<div class=\"modal-actions\">"
+        + "<button class=\"btn btn-ghost\" id=\"btnCloseBio\">Close</button>"
+        + (canEdit() ? "<button class=\"btn btn-accent\" id=\"btnEditFromBio\">Edit</button>" : "")
+      + "</div>";
+    document.getElementById("bioModal").innerHTML = html;
+    document.getElementById("bioOverlay").hidden = false;
+    document.getElementById("bioModal").querySelectorAll(".lightbox-trigger").forEach(function(img){
+      img.addEventListener("click", function(e){
+        e.stopPropagation();
+        openLightbox(img.src, img.alt);
+      });
+    });
+    document.getElementById("btnCloseBio").addEventListener("click", closeBio);
+    var editFromBio = document.getElementById("btnEditFromBio");
+    if (editFromBio) editFromBio.addEventListener("click", function(){
+      closeBio();
+      openMemberModal(mem);
+    });
+  }
+  function closeBio(){ document.getElementById("bioOverlay").hidden = true; }
+  document.getElementById("bioOverlay").addEventListener("click", function(e){
+    if (e.target.id === "bioOverlay") closeBio();
+  });
+
+  /* ============================= LIGHTBOX ============================= */
+
+  function openLightbox(src, alt){
+    document.getElementById("lightboxImg").src = src;
+    document.getElementById("lightboxImg").alt = alt || "";
+    document.getElementById("lightboxOverlay").hidden = false;
+  }
+  function closeLightbox(){
+    document.getElementById("lightboxOverlay").hidden = true;
+    document.getElementById("lightboxImg").src = "";
+  }
+  document.getElementById("lightboxOverlay").addEventListener("click", closeLightbox);
+
+  /* ============================= ADD / EDIT MODAL ============================= */
+
+  function renderFlashPicker(){
+    var el = document.getElementById("flashPicker");
+    if (!state.flashOptions.length){
+      el.innerHTML = "<div class=\"flash-empty-hint\">No flash types yet — add one below.</div>";
+      return;
+    }
+    el.innerHTML = state.flashOptions.map(function(f){
+      var sel = selectedFlashes.indexOf(f) !== -1;
+      return "<span class=\"flash-pick" + (sel ? " selected" : "") + "\" data-flash=\"" + esc(f) + "\">" + esc(f) + "</span>";
+    }).join("");
+    el.querySelectorAll(".flash-pick").forEach(function(chip){
+      chip.addEventListener("click", function(){
+        var f = chip.getAttribute("data-flash");
+        var i = selectedFlashes.indexOf(f);
+        if (i === -1) selectedFlashes.push(f); else selectedFlashes.splice(i,1);
+        renderFlashPicker();
+      });
+    });
+  }
+
+  document.getElementById("btnAddFlashOption").addEventListener("click", function(){
+    if (!canEdit()) return;
+    var input = document.getElementById("fNewFlash");
+    var name = input.value.trim();
+    if (!name) return;
+    if (selectedFlashes.indexOf(name) === -1) selectedFlashes.push(name);
+    if (state.flashOptions.indexOf(name) === -1){
+      state.flashOptions.push(name);
+      addFlashOption(name);
+    }
+    input.value = "";
+    renderFlashPicker();
+  });
+
+  function populateRankOptions(){
+    var select = document.getElementById("fRank");
+    select.innerHTML = RANKS.map(function(r){
+      return "<option value=\"" + esc(r) + "\">" + esc(r) + "</option>";
+    }).join("");
+  }
+
+  function openMemberModal(mem){
+    if (!canEdit()) return;
+    editingId = mem ? mem.ID : null;
+    document.getElementById("memberModalTitle").textContent = mem ? "Edit Member" : "Add Member";
+    document.getElementById("fName").value = mem ? mem.Name : "";
+    document.getElementById("fRank").value = mem ? mem.Rank : "";
+    document.getElementById("fFlag").value = mem ? mem.Flag : "";
+    document.getElementById("fBio").value = mem ? mem.Bio : "";
+    document.getElementById("fPhoto").value = mem ? mem.PhotoURL : "";
+    document.getElementById("fBike").value = mem ? mem.BikePhotoURL : "";
+    document.getElementById("fNewFlash").value = "";
+    selectedFlashes = mem ? flashList(mem) : [];
+    renderFlashPicker();
+    document.getElementById("memberFormError").style.display = "none";
+    document.getElementById("memberOverlay").hidden = false;
+    document.getElementById("fName").focus();
+  }
+  function closeMemberModal(){ document.getElementById("memberOverlay").hidden = true; editingId = null; }
+
+  document.getElementById("btnAddMember").addEventListener("click", function(){ openMemberModal(null); });
+  document.getElementById("btnCancelMember").addEventListener("click", closeMemberModal);
+  document.getElementById("memberOverlay").addEventListener("click", function(e){
+    if (e.target.id === "memberOverlay") closeMemberModal();
+  });
+
+  document.getElementById("btnSaveMember").addEventListener("click", function(){
+    if (!canEdit()){ showToast("You're not authorized to edit the roster."); return; }
+    var name = document.getElementById("fName").value.trim();
+    var errEl = document.getElementById("memberFormError");
+    if (!name){
+      errEl.textContent = "Enter a name first.";
+      errEl.style.display = "block";
+      return;
+    }
+    errEl.style.display = "none";
+
+    var data = {
+      Name: name,
+      Rank: document.getElementById("fRank").value.trim(),
+      Flag: document.getElementById("fFlag").value.trim(),
+      Bio: document.getElementById("fBio").value.trim(),
+      Flashes: selectedFlashes.slice(),
+      PhotoURL: document.getElementById("fPhoto").value.trim(),
+      BikePhotoURL: document.getElementById("fBike").value.trim()
+    };
+
+    var action = editingId ? updateMember(editingId, data) : addMember(data);
+    action.then(function(){ closeMemberModal(); }).catch(function(){});
+  });
+
+  /* ============================= SEARCH ============================= */
+
+  document.getElementById("searchInput").addEventListener("input", function(e){
+    filterText = e.target.value; renderRoster();
+  });
+
+  /* ============================= EXPORT ============================= */
+
+  document.getElementById("btnExport").addEventListener("click", function(){
+    var blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    var d = new Date();
+    var stamp = d.getFullYear() + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" + ("0"+d.getDate()).slice(-2);
+    a.href = url; a.download = "vandros-roster-" + stamp + ".json";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast("Backup downloaded.");
+  });
+
+  /* ============================= INIT ============================= */
+
+  function init(){
+    populateRankOptions();
+
+    if (!handleDiscordRedirect()){
+      restoreDiscordSession();
+    }
+    updateAuthUI();
+    initFirebase();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
