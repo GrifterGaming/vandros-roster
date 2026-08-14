@@ -232,8 +232,8 @@
   .flash-add-row{display:flex; gap:6px;}
   .flash-add-row input{flex:1;}
   .flash-empty-hint{font-size:11.5px; color:var(--text-muted);}
-  .bike-photo{width:100%; border-radius:var(--radius); display:block; max-height:220px; object-fit:cover;}
-  .bike-empty{
+  .media-photo{width:100%; border-radius:var(--radius); display:block; max-height:220px; object-fit:cover;}
+  .media-empty{
     border:1px dashed var(--line-strong); border-radius:var(--radius); padding:22px;
     text-align:center; font-size:12px; color:var(--text-muted);
   }
@@ -663,11 +663,15 @@
       + "<div class=\"bio-section-label\">Earned Flashes</div>"
       + (flashes.length
           ? "<div class=\"flash-row\">" + flashes.map(function(f){ return "<span class=\"flash-chip\">" + esc(f) + "</span>"; }).join("") + "</div>"
-          : "<div class=\"bike-empty\">No flashes recorded yet.</div>")
+          : "<div class=\"media-empty\">No flashes recorded yet.</div>")
+      + "<div class=\"bio-section-label\">Photo</div>"
+      + (mem.PhotoURL
+          ? "<img class=\"media-photo lightbox-trigger\" src=\"" + esc(mem.PhotoURL) + "\" alt=\"" + esc(mem.Name) + "\">"
+          : "<div class=\"media-empty\">No photo yet.</div>")
       + "<div class=\"bio-section-label\">Bike</div>"
       + (mem.BikePhotoURL
-          ? "<img class=\"bike-photo lightbox-trigger\" src=\"" + esc(mem.BikePhotoURL) + "\" alt=\"" + esc(mem.Name) + "'s bike\">"
-          : "<div class=\"bike-empty\">No bike photo yet.</div>")
+          ? "<img class=\"media-photo lightbox-trigger\" src=\"" + esc(mem.BikePhotoURL) + "\" alt=\"" + esc(mem.Name) + "'s bike\">"
+          : "<div class=\"media-empty\">No bike photo yet.</div>")
     + "</div>";
   }
 
