@@ -371,9 +371,10 @@
   ];
 
   var RANKS = ["President","Vice President","Sergeant At Arms","Road Captain","Secretary",
-    "Treasurer","Enforcer","Full Patch","Prospect","Hangaround","Nomad"];
+    "Treasurer","Enforcer","Tail Gunner","Chaplain","Full Patch","Prospect","Hangaround","Nomad"];
 
-  var OFFICER_RANKS = ["President","Vice President","Sergeant At Arms","Road Captain","Secretary","Treasurer","Enforcer"];
+  var OFFICER_RANKS = ["President","Vice President","Sergeant At Arms","Road Captain","Secretary",
+    "Treasurer","Enforcer","Tail Gunner","Chaplain"];
   var SECTION_ORDER = ["Officers","Patch Members","Prospects","Hangaround","Nomad"];
 
   function sectionForRank(rank){
@@ -677,6 +678,9 @@
     var grouped = {};
     SECTION_ORDER.forEach(function(s){ grouped[s] = []; });
     filtered.forEach(function(mem){ grouped[sectionForRank(mem.Rank)].push(mem); });
+    SECTION_ORDER.forEach(function(s){
+      grouped[s].sort(function(a, b){ return RANKS.indexOf(a.Rank) - RANKS.indexOf(b.Rank); });
+    });
 
     var editable = canEdit();
     var html = "";
