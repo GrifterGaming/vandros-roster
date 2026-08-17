@@ -242,6 +242,8 @@
   .flash-empty-hint{font-size:11.5px; color:var(--text-muted);}
   .media-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
   .media-caption{font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px; text-align:center;}
+  .flash-group{margin-bottom:8px;}
+  .flash-group-label{font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;}
   .media-photo{
     width:100%; aspect-ratio:1/1; border-radius:var(--radius); display:block;
     object-fit:contain; background:var(--surface-2);
@@ -346,7 +348,7 @@
       </div>
       <div class="field full">
         <label>Earned Flashes</label>
-        <div class="flash-picker" id="flashPicker"></div>
+        <div id="flashPicker"></div>
         <div class="flash-add-row">
           <input type="text" id="fNewFlash" placeholder="Add a new flash type…">
           <button type="button" class="btn btn-sm" id="btnAddFlashOption">+ Add</button>
@@ -554,6 +556,20 @@
     return Array.isArray(mem.Flashes) ? mem.Flashes : [];
   }
 
+  var FLASH_GROUPS = ["Pins","Patches","Rockers","Other"];
+  function categorizeFlash(name){
+    if (/pin$/i.test(name)) return "Pins";
+    if (/patch$/i.test(name)) return "Patches";
+    if (/rocker$/i.test(name)) return "Rockers";
+    return "Other";
+  }
+  function groupFlashes(list){
+    var groups = {};
+    FLASH_GROUPS.forEach(function(g){ groups[g] = []; });
+    list.forEach(function(f){ groups[categorizeFlash(f)].push(f); });
+    return groups;
+  }
+
   function avatarFallback(img){
     var row = img.closest(".row");
     var id = row ? row.getAttribute("data-id") : "";
@@ -712,7 +728,17 @@
           : "")
       + "<div class=\"bio-section-label\">Earned Flashes</div>"
       + (flashes.length
-          ? "<div class=\"flash-row\">" + flashes.map(function(f){ return "<span class=\"flash-chip\">" + esc(f) + "</span>"; }).join("") + "</div>"
+          ? (function(){
+              var grouped = groupFlashes(flashes);
+              return FLASH_GROUPS.map(function(group){
+                var items = grouped[group];
+                if (!items.length) return "";
+                return "<div class=\"flash-group\">"
+                  + "<div class=\"flash-group-label\">" + esc(group) + "</div>"
+                  + "<div class=\"flash-row\">" + items.map(function(f){ return "<span class=\"flash-chip\">" + esc(f) + "</span>"; }).join("") + "</div>"
+                + "</div>";
+              }).join("");
+            })()
           : "<div class=\"media-empty\">No flashes recorded yet.</div>")
     + "</div>";
   }
@@ -855,9 +881,19 @@
       el.innerHTML = "<div class=\"flash-empty-hint\">No flash types yet — add one below.</div>";
       return;
     }
-    el.innerHTML = state.flashOptions.map(function(f){
-      var sel = selectedFlashes.indexOf(f) !== -1;
-      return "<span class=\"flash-pick" + (sel ? " selected" : "") + "\" data-flash=\"" + esc(f) + "\">" + esc(f) + "</span>";
+    var grouped = groupFlashes(state.flashOptions);
+    el.innerHTML = FLASH_GROUPS.map(function(group){
+      var items = grouped[group];
+      if (!items.length) return "";
+      return "<div class=\"flash-group\">"
+        + "<div class=\"flash-group-label\">" + esc(group) + "</div>"
+        + "<div class=\"flash-picker\">"
+          + items.map(function(f){
+              var sel = selectedFlashes.indexOf(f) !== -1;
+              return "<span class=\"flash-pick" + (sel ? " selected" : "") + "\" data-flash=\"" + esc(f) + "\">" + esc(f) + "</span>";
+            }).join("")
+        + "</div>"
+      + "</div>";
     }).join("");
     el.querySelectorAll(".flash-pick").forEach(function(chip){
       chip.addEventListener("click", function(){
