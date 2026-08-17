@@ -164,9 +164,9 @@
     font-size:10px; color:var(--text-muted); flex:none; transition:transform .2s ease;
   }
   .row.expanded .row-chevron{transform:rotate(180deg);}
-  .ck-status{font-size:12px; margin:4px 0 0;}
+  .ck-status{font-size:12px; margin:4px 0 14px;}
   .row-detail{max-height:0; overflow:hidden; transition:max-height .3s ease;}
-  .row-detail.open{max-height:700px;}
+  .row-detail.open{max-height:2000px;}
   .detail-inner{padding:4px 16px 18px;}
   .avatar{
     width:38px; height:38px; border-radius:50%; flex:none; overflow:hidden;
@@ -556,7 +556,7 @@
     return Array.isArray(mem.Flashes) ? mem.Flashes : [];
   }
 
-  var FLASH_GROUPS = ["Pins","Patches","Rockers","Other"];
+  var FLASH_GROUPS = ["Other","Pins","Patches","Rockers"];
   function categorizeFlash(name){
     if (/pin$/i.test(name)) return "Pins";
     if (/patch$/i.test(name)) return "Patches";
@@ -726,7 +726,6 @@
               + "</label>"
               : "<p class=\"ck-status\" style=\"color:" + (mem.CKAgreement ? "var(--accent-text)" : "var(--text-muted)") + ";\">" + (mem.CKAgreement ? "✓ CK Agreement signed" : "CK Agreement not signed") + "</p>")
           : "")
-      + "<div class=\"bio-section-label\">Earned Flashes</div>"
       + (flashes.length
           ? (function(){
               var grouped = groupFlashes(flashes);
@@ -734,7 +733,7 @@
                 var items = grouped[group];
                 if (!items.length) return "";
                 return "<div class=\"flash-group\">"
-                  + "<div class=\"flash-group-label\">" + esc(group) + "</div>"
+                  + (group === "Other" ? "" : "<div class=\"flash-group-label\">" + esc(group) + "</div>")
                   + "<div class=\"flash-row\">" + items.map(function(f){ return "<span class=\"flash-chip\">" + esc(f) + "</span>"; }).join("") + "</div>"
                 + "</div>";
               }).join("");
@@ -886,7 +885,7 @@
       var items = grouped[group];
       if (!items.length) return "";
       return "<div class=\"flash-group\">"
-        + "<div class=\"flash-group-label\">" + esc(group) + "</div>"
+        + (group === "Other" ? "" : "<div class=\"flash-group-label\">" + esc(group) + "</div>")
         + "<div class=\"flash-picker\">"
           + items.map(function(f){
               var sel = selectedFlashes.indexOf(f) !== -1;
