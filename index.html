@@ -164,6 +164,14 @@
     font-size:10px; color:var(--text-muted); flex:none; transition:transform .2s ease;
   }
   .row.expanded .row-chevron{transform:rotate(180deg);}
+  .ck-indicator{
+    width:18px; height:18px; border-radius:50%; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:700; line-height:1;
+    border:1.5px solid var(--line-strong); color:transparent;
+  }
+  .ck-indicator.on{background:var(--accent-soft); border-color:rgba(39,78,19,0.7); color:var(--accent-text);}
+  .ck-status{font-size:12px; margin:4px 0 0;}
   .row-detail{max-height:0; overflow:hidden; transition:max-height .3s ease;}
   .row-detail.open{max-height:700px;}
   .detail-inner{padding:4px 16px 18px;}
@@ -338,6 +346,12 @@
       <div class="field full"><label>Name</label><input type="text" id="fName"></div>
       <div class="field"><label>Rank</label><select id="fRank"></select></div>
       <div class="field"><label>Flag</label><input type="text" id="fFlag" placeholder="🇺🇸"></div>
+      <div class="field">
+        <label>CK Agreement</label>
+        <label style="display:flex; align-items:center; gap:8px; font-weight:400; text-transform:none; letter-spacing:0; color:var(--text-primary); font-size:13px; height:36px;">
+          <input type="checkbox" id="fCK"> Signed
+        </label>
+      </div>
       <div class="field full"><label>Short Bio</label><textarea id="fBio"></textarea></div>
       <div class="field full">
         <label>Earned Flashes</label>
@@ -698,6 +712,9 @@
             ? "<img class=\"banner-photo lightbox-trigger\" src=\"" + esc(mem.PhotoURL) + "\" alt=\"" + esc(mem.Name) + "\">"
             : "<div class=\"banner-empty\">No photo yet.</div>")
       + "</div>"
+      + (sectionForRank(mem.Rank) !== "Hangaround"
+          ? "<p class=\"ck-status\" style=\"color:" + (mem.CKAgreement ? "var(--accent-text)" : "var(--text-muted)") + ";\">" + (mem.CKAgreement ? "✓ CK Agreement signed" : "CK Agreement not signed") + "</p>"
+          : "")
       + (mem.Bio ? "<p class=\"bio-bio\">" + esc(mem.Bio) + "</p>" : "<p class=\"bio-bio\" style=\"color:var(--text-muted);\">No bio yet.</p>")
       + "<div class=\"bio-section-label\">Earned Flashes</div>"
       + (flashes.length
@@ -714,6 +731,9 @@
         + "<button class=\"row-name\" data-act=\"view\">" + esc(mem.Name) + "</button>"
         + "<div class=\"row-rank\">" + esc(mem.Rank) + "</div>"
         + "<div class=\"row-flag\">" + esc(mem.Flag) + "</div>"
+        + (sectionForRank(mem.Rank) !== "Hangaround"
+            ? "<span class=\"ck-indicator" + (mem.CKAgreement ? " on" : "") + "\" title=\"CK Agreement" + (mem.CKAgreement ? " signed" : " not signed") + "\">&#10003;</span>"
+            : "")
         + "<span class=\"row-chevron\">&#9662;</span>"
         + (editable
             ? "<div class=\"row-menu\">"
@@ -879,6 +899,7 @@
     document.getElementById("fName").value = mem ? mem.Name : "";
     document.getElementById("fRank").value = mem ? mem.Rank : "";
     document.getElementById("fFlag").value = mem ? mem.Flag : "";
+    document.getElementById("fCK").checked = mem ? !!mem.CKAgreement : false;
     document.getElementById("fBio").value = mem ? mem.Bio : "";
     document.getElementById("fPhoto").value = mem ? mem.PhotoURL : "";
     document.getElementById("fNewFlash").value = "";
@@ -911,6 +932,7 @@
       Name: name,
       Rank: document.getElementById("fRank").value.trim(),
       Flag: document.getElementById("fFlag").value.trim(),
+      CKAgreement: document.getElementById("fCK").checked,
       Bio: document.getElementById("fBio").value.trim(),
       Flashes: selectedFlashes.slice(),
       PhotoURL: document.getElementById("fPhoto").value.trim()
