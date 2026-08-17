@@ -347,7 +347,11 @@
           <button type="button" class="btn btn-sm" id="btnAddFlashOption">+ Add</button>
         </div>
       </div>
-      <div class="field full"><label>Photo URL</label><input type="text" id="fPhoto" placeholder="https://…"></div>
+      <div class="field full">
+        <label>Photo URL</label>
+        <input type="text" id="fPhoto" placeholder="https://…">
+        <div class="flash-empty-hint">Don't use a Discord link — those expire and the photo will break later. On Imgur, right-click the image itself and "Copy image address" (the link should end in .jpg/.png, not just imgur.com/xxxxx).</div>
+      </div>
     </div>
     <div class="field-error" id="memberFormError" style="display:none;"></div>
     <div class="modal-actions">
@@ -545,11 +549,24 @@
     return Array.isArray(mem.Flashes) ? mem.Flashes : [];
   }
 
+  function avatarFallback(img){
+    var row = img.closest(".row");
+    var id = row ? row.getAttribute("data-id") : "";
+    var name = row ? row.querySelector(".row-name").textContent : "";
+    var parent = img.parentElement;
+    parent.style.background = colorFor(id || name);
+    parent.textContent = initials(name);
+  }
+
+  function bannerPhotoError(img){
+    img.parentElement.innerHTML = "<div class=\"banner-empty\">Photo unavailable</div>";
+  }
+
   function avatarHtml(mem, size){
     var cls = size === "lg" ? "bio-avatar" : "avatar";
     if (mem.PhotoURL){
-      var imgClass = size === "lg" ? " class=\"lightbox-trigger\"" : "";
-      return "<div class=\"" + cls + "\"><img" + imgClass + " src=\"" + esc(mem.PhotoURL) + "\" alt=\"\"></div>";
+      var imgClass = size === "lg" ? "avatar-img lightbox-trigger" : "avatar-img";
+      return "<div class=\"" + cls + "\"><img class=\"" + imgClass + "\" src=\"" + esc(mem.PhotoURL) + "\" alt=\"\"></div>";
     }
     return "<div class=\"" + cls + "\" style=\"background:" + colorFor(mem.ID || mem.Name) + "\">" + esc(initials(mem.Name)) + "</div>";
   }
@@ -789,6 +806,13 @@
         e.stopPropagation();
         openLightbox(img.src, img.alt);
       });
+    });
+
+    root.querySelectorAll(".avatar-img").forEach(function(img){
+      img.addEventListener("error", function(){ avatarFallback(img); });
+    });
+    root.querySelectorAll(".banner-photo").forEach(function(img){
+      img.addEventListener("error", function(){ bannerPhotoError(img); });
     });
   }
 
