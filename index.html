@@ -224,7 +224,6 @@
   .bio-name{font-family:var(--font-display); font-size:19px; font-weight:600; margin:0;}
   .bio-rank{font-size:12.5px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.04em; margin:3px 0 0;}
   .bio-section-label{font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; margin:14px 0 6px;}
-  .bio-bio{font-size:13.5px; color:var(--text-secondary); line-height:1.6; margin:0;}
   .flash-row{display:flex; flex-wrap:wrap; gap:6px;}
   .flash-chip{
     font-size:11.5px; font-weight:700; padding:4px 10px; border-radius:20px;
@@ -345,7 +344,6 @@
           <input type="checkbox" id="fCK"> Signed
         </label>
       </div>
-      <div class="field full"><label>Short Bio</label><textarea id="fBio"></textarea></div>
       <div class="field full">
         <label>Earned Flashes</label>
         <div class="flash-picker" id="flashPicker"></div>
@@ -712,7 +710,6 @@
               + "</label>"
               : "<p class=\"ck-status\" style=\"color:" + (mem.CKAgreement ? "var(--accent-text)" : "var(--text-muted)") + ";\">" + (mem.CKAgreement ? "✓ CK Agreement signed" : "CK Agreement not signed") + "</p>")
           : "")
-      + (mem.Bio ? "<p class=\"bio-bio\">" + esc(mem.Bio) + "</p>" : "<p class=\"bio-bio\" style=\"color:var(--text-muted);\">No bio yet.</p>")
       + "<div class=\"bio-section-label\">Earned Flashes</div>"
       + (flashes.length
           ? "<div class=\"flash-row\">" + flashes.map(function(f){ return "<span class=\"flash-chip\">" + esc(f) + "</span>"; }).join("") + "</div>"
@@ -901,7 +898,6 @@
     document.getElementById("fRank").value = mem ? mem.Rank : "";
     document.getElementById("fFlag").value = mem ? mem.Flag : "";
     document.getElementById("fCK").checked = mem ? !!mem.CKAgreement : false;
-    document.getElementById("fBio").value = mem ? mem.Bio : "";
     document.getElementById("fPhoto").value = mem ? mem.PhotoURL : "";
     document.getElementById("fNewFlash").value = "";
     selectedFlashes = mem ? flashList(mem) : [];
@@ -934,7 +930,6 @@
       Rank: document.getElementById("fRank").value.trim(),
       Flag: document.getElementById("fFlag").value.trim(),
       CKAgreement: document.getElementById("fCK").checked,
-      Bio: document.getElementById("fBio").value.trim(),
       Flashes: selectedFlashes.slice(),
       PhotoURL: document.getElementById("fPhoto").value.trim()
     };
