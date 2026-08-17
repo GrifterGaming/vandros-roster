@@ -706,7 +706,11 @@
             : "<div class=\"banner-empty\">No photo yet.</div>")
       + "</div>"
       + (sectionForRank(mem.Rank) !== "Hangaround"
-          ? "<p class=\"ck-status\" style=\"color:" + (mem.CKAgreement ? "var(--accent-text)" : "var(--text-muted)") + ";\">" + (mem.CKAgreement ? "✓ CK Agreement signed" : "CK Agreement not signed") + "</p>"
+          ? (canEdit()
+              ? "<label class=\"ck-status\" style=\"display:flex; align-items:center; gap:7px; cursor:pointer;\">"
+                + "<input type=\"checkbox\" class=\"ck-toggle\" data-id=\"" + esc(mem.ID) + "\"" + (mem.CKAgreement ? " checked" : "") + "> CK Agreement signed"
+              + "</label>"
+              : "<p class=\"ck-status\" style=\"color:" + (mem.CKAgreement ? "var(--accent-text)" : "var(--text-muted)") + ";\">" + (mem.CKAgreement ? "✓ CK Agreement signed" : "CK Agreement not signed") + "</p>")
           : "")
       + (mem.Bio ? "<p class=\"bio-bio\">" + esc(mem.Bio) + "</p>" : "<p class=\"bio-bio\" style=\"color:var(--text-muted);\">No bio yet.</p>")
       + "<div class=\"bio-section-label\">Earned Flashes</div>"
@@ -823,6 +827,13 @@
     });
     root.querySelectorAll(".banner-photo").forEach(function(img){
       img.addEventListener("error", function(){ bannerPhotoError(img); });
+    });
+
+    root.querySelectorAll(".ck-toggle").forEach(function(cb){
+      cb.addEventListener("change", function(){
+        var id = cb.getAttribute("data-id");
+        updateMember(id, { CKAgreement: cb.checked });
+      });
     });
   }
 
